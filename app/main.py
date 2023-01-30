@@ -7,7 +7,11 @@ def main():
 
     server_socket = socket.create_server(("localhost", 6379), reuse_port=True)
     conn, _ = server_socket.accept()
-    conn.send("+PONG\r\n".encode())
+    while True:
+        data = conn.recv(1024)
+        if not data:
+            break
+        conn.send("+PONG\r\n".encode())
 
 
 if __name__ == "__main__":
