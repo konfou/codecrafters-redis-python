@@ -1,4 +1,18 @@
 import socket
+import threading
+
+
+class ClientThread(threading.Thread):
+    def __init__(self, conn):
+        threading.Thread.__init__(self)
+        self.conn = conn
+
+    def run(self):
+        while True:
+            data = self.conn.recv(1024)
+            if not data:
+                break
+            self.conn.send("+PONG\r\n".encode())
 
 
 def main():
@@ -6,12 +20,10 @@ def main():
     print("Logs from your program will appear here!")
 
     server_socket = socket.create_server(("localhost", 6379), reuse_port=True)
-    conn, _ = server_socket.accept()
     while True:
-        data = conn.recv(1024)
-        if not data:
-            break
-        conn.send("+PONG\r\n".encode())
+        conn, _ = server_socket.accept()
+        new_thread = ClientThread(conn)
+        new_thread.start()
 
 
 if __name__ == "__main__":
